@@ -1,26 +1,19 @@
-import { Outlet, useLocation } from "react-router-dom";
-import Navbar from "./Navbar";
-import Footer from "./Footer";
-import { useEffect } from "react";
+import { SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
+import { AppSidebar } from "../components/app-sidebar";
+import { Outlet } from "react-router";
+import AppearanceToggleTab from "./appearance-tabs";
 
-const Layout = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-  }, [location]);
-
+export default function Layout() {
   return (
-    <div className="relative min-h-screen font-[poppins]">
-      <div className="fixed z-20 w-full">
-        <Navbar />
-      </div>
-      <Outlet />
-      <div className="w-full">
-        <Footer />
-      </div>
-    </div>
+    <SidebarProvider>
+      <AppSidebar />
+      <main className="p-4 w-full font-[poppins]">
+        <div className="flex items-center justify-between">
+          <SidebarTrigger className="text-2xl" />
+          <AppearanceToggleTab />
+        </div>
+        <Outlet />
+      </main>
+    </SidebarProvider>
   );
-};
-
-export default Layout;
+}

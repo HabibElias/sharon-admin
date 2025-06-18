@@ -68,17 +68,17 @@ const Dashboard = () => {
   const totalMembers = members.length;
 
   return (
-    <div className="p-6 pt-28">
+    <div className="p-6">
       {/* Admin Dashboard */}
       <h1 className="mb-6 text-3xl font-bold">Dashboard</h1>
 
       {/* Summary Cards */}
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border bg-white p-4 shadow">
-          <h2 className="text-lg font-semibold">Total Donations</h2>
+        <div className="rounded-lg border bg-white dark:bg-neutral-700 p-4 shadow">
+          <h2 className="text-lg font-semibold ">Total Donations</h2>
           <p className="text-2xl font-bold">{totalDonations}</p>
         </div>
-        <div className="rounded-lg border bg-white p-4 shadow">
+        <div className="rounded-lg border bg-white dark:bg-neutral-700 p-4 shadow">
           <h2 className="text-lg font-semibold">Total Members</h2>
           <p className="text-2xl font-bold">{totalMembers}</p>
         </div>

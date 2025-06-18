@@ -9,7 +9,7 @@ const InProgress: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center h-screen text-center">
       <img
-        src="/public/logo.png"
+        src="/logo.png"
         alt="In Progress"
         className="w-32 h-32 mb-6 animate-bounce"
       />

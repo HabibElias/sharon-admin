@@ -6,11 +6,13 @@ import InProgress from "./pages/InProgress";
 
 const routes = createBrowserRouter([
   {
+    path: "/login",
+    element: <Login />,
+  },
+  {
     element: <Layout />,
     children: [
-      { path: "", element: <Dashboard /> },
       { path: "/dashboard", element: <Dashboard /> },
-      { path: "login", element: <Login /> },
       { path: "*", element: <InProgress /> }, // Fallback for unimplemented routes
     ],
   },
