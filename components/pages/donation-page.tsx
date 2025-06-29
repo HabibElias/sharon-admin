@@ -1,16 +1,56 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { DollarSign, TrendingUp, Calendar, CreditCard, Search, Download, Plus, Users } from "lucide-react"
+import { useCallback, useState } from "react";
+import {
+  DollarSign,
+  TrendingUp,
+  Calendar,
+  CreditCard,
+  Search,
+  Download,
+  Plus,
+  Users,
+} from "lucide-react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+} from "recharts";
 import {
   Dialog,
   DialogContent,
@@ -19,9 +59,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import useDonations from "@/hooks/use-donations";
+import Donation from "@/models/Donation";
 
 // Sample donation data
 const donations = [
@@ -70,14 +112,7 @@ const donations = [
     date: "2024-01-11",
     status: "Completed",
   },
-]
-
-const donationStats = [
-  { type: "One Time", count: 1200, amount: 125400, color: "bg-blue-500" },
-  { type: "Monthly", count: 800, amount: 240000, color: "bg-green-500" },
-  { type: "Yearly", count: 400, amount: 180000, color: "bg-yellow-500" },
-  { type: "Quarterly", count: 300, amount: 90000, color: "bg-purple-500" },
-]
+];
 
 const monthlyTrends = [
   { month: "Jan", amount: 45000 },
@@ -86,107 +121,144 @@ const monthlyTrends = [
   { month: "Apr", amount: 61000 },
   { month: "May", amount: 55000 },
   { month: "Jun", amount: 67000 },
-]
+];
 
 const chartConfig = {
   amount: {
     label: "Amount",
     color: "#8884d8",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function DonationPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterType, setFilterType] = useState("all")
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [addDonationDialogOpen, setAddDonationDialogOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [addDonationDialogOpen, setAddDonationDialogOpen] = useState(false);
   const [donationForm, setDonationForm] = useState({
     donor: "",
     amount: "",
     type: "",
     method: "",
     notes: "",
-  })
+  });
 
-  const filteredDonations = donations.filter((donation) => {
-    const matchesSearch = donation.donor.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesType = filterType === "all" || donation.type === filterType
-    const matchesStatus = filterStatus === "all" || donation.status === filterStatus
+  const { data: donations, isLoading, error } = useDonations();
 
-    return matchesSearch && matchesType && matchesStatus
-  })
+  if (isLoading) {
+    return <p>Loading donations...</p>;
+  }
+
+  if (error) {
+    return <p>Error loading donations: {error.message}</p>;
+  }
 
   const getTypeBadgeColor = (type: string) => {
     switch (type) {
       case "One Time":
-        return "bg-blue-100 text-blue-800"
+        return "bg-blue-100 text-blue-800";
       case "Monthly":
-        return "bg-green-100 text-green-800"
-      case "Yearly":
-        return "bg-yellow-100 text-yellow-800"
-      case "Quarterly":
-        return "bg-purple-100 text-purple-800"
+        return "bg-green-100 text-green-800";
+      case "Annually":
+        return "bg-yellow-100 text-yellow-800";
+      case "money":
+        return "bg-blue-100 text-blue-800";
+      case "material":
+        return "bg-yellow-100 text-yellow-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
+  };
+
+  const donationStats =
+    donations?.reduce<
+      Record<string, { count: number; amount: number; color: string }>
+    >((stats, donation) => {
+      const type = donation.donationType;
+      if (!stats[type]) {
+        stats[type] = {
+          count: 0,
+          amount: 0,
+          color: getTypeBadgeColor(type),
+        };
+      }
+      stats[type].count += 1;
+      stats[type].amount += donation.amount;
+      return stats;
+    }, {}) ?? {};
+
+  const totalDonations =
+    donations?.reduce(
+      (sum: number, donation: Donation) => sum + donation.amount,
+      0
+    ) ?? 0;
+  const totalDonors = new Set(
+    donations?.map((donation: Donation) => donation.fullName) ?? []
+  ).size;
+
+  const filteredDonations =
+    donations?.filter((donation: Donation) => {
+      const matchesSearch = donation.fullName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const matchesType =
+        filterType === "all" || donation.donationType === filterType;
+
+      return matchesSearch && matchesType;
+    }) ?? [];
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
       case "Completed":
-        return "bg-green-100 text-green-800"
+        return "bg-green-100 text-green-800";
       case "Pending":
-        return "bg-yellow-100 text-yellow-800"
+        return "bg-yellow-100 text-yellow-800";
       case "Failed":
-        return "bg-red-100 text-red-800"
+        return "bg-red-100 text-red-800";
       default:
-        return "bg-gray-100 text-gray-800"
+        return "bg-gray-100 text-gray-800";
     }
-  }
-
-  const totalDonations = donationStats.reduce((sum, stat) => sum + stat.amount, 0)
-  const totalDonors = donationStats.reduce((sum, stat) => sum + stat.count, 0)
+  };
 
   const handleAddDonation = () => {
     // Handle add donation logic here
-    console.log("Adding donation:", donationForm)
+    console.log("Adding donation:", donationForm);
     setDonationForm({
       donor: "",
       amount: "",
       type: "",
       method: "",
       notes: "",
-    })
-    setAddDonationDialogOpen(false)
-  }
+    });
+    setAddDonationDialogOpen(false);
+  };
 
   const handleExport = () => {
     // Handle export logic here
-    console.log("Exporting donations data...")
+    console.log("Exporting donations data...");
     // Create CSV content
     const csvContent = [
       ["Donor", "Amount", "Type", "Method", "Date", "Status"],
       ...filteredDonations.map((donation) => [
-        donation.donor,
+        donation.fullName,
         donation.amount,
-        donation.type,
-        donation.method,
+        donation.donationType,
+        donation.paymentMethod,
         donation.date,
-        donation.status,
       ]),
     ]
       .map((row) => row.join(","))
-      .join("\n")
+      .join("\n");
 
     // Create and download file
-    const blob = new Blob([csvContent], { type: "text/csv" })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "donations-export.csv"
-    a.click()
-    window.URL.revokeObjectURL(url)
-  }
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "donations-export.csv";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4">
@@ -194,11 +266,15 @@ export function DonationPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Donations</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Donations
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalDonations.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              ${totalDonations.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-600">+12%</span> from last month
             </p>
@@ -210,7 +286,9 @@ export function DonationPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalDonors.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {totalDonors.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-600">+8%</span> from last month
             </p>
@@ -222,41 +300,35 @@ export function DonationPage() {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${Math.round(totalDonations / totalDonors).toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              ${Math.round(totalDonations / totalDonors).toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground">Per donor</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">This Month</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$67,000</div>
-            <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">+15%</span> from last month
-            </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Donation Statistics by Type */}
       <div className="grid gap-4 md:grid-cols-4">
-        {donationStats.map((stat) => (
-          <Card key={stat.type}>
+        {Object.entries(donationStats).map(([type, stat]) => (
+          <Card key={type}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.type}</CardTitle>
+              <CardTitle className="text-sm font-medium">{type}</CardTitle>
               <div className={`h-4 w-4 rounded-full ${stat.color}`} />
             </CardHeader>
             <CardContent>
-              <div className="text-lg font-bold">{stat.count.toLocaleString()}</div>
-              <p className="text-xs text-muted-foreground">${stat.amount.toLocaleString()} total</p>
+              <div className="text-lg font-bold">
+                {stat.count.toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                ${stat.amount?.toLocaleString()} total
+              </p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Donor Management */}
+      {/* Donor Management
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -314,10 +386,10 @@ export function DonationPage() {
             </div>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Monthly Trends Chart */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Monthly Donation Trends</CardTitle>
           <CardDescription>Donation amounts over the past 6 months</CardDescription>
@@ -341,7 +413,7 @@ export function DonationPage() {
             </ResponsiveContainer>
           </ChartContainer>
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* Recent Donations */}
       <Card>
@@ -356,7 +428,10 @@ export function DonationPage() {
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
-              <Dialog open={addDonationDialogOpen} onOpenChange={setAddDonationDialogOpen}>
+              <Dialog
+                open={addDonationDialogOpen}
+                onOpenChange={setAddDonationDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button size="sm">
                     <Plus className="h-4 w-4 mr-2" />
@@ -366,7 +441,9 @@ export function DonationPage() {
                 <DialogContent className="sm:max-w-[525px]">
                   <DialogHeader>
                     <DialogTitle>Add New Donation</DialogTitle>
-                    <DialogDescription>Record a new donation transaction.</DialogDescription>
+                    <DialogDescription>
+                      Record a new donation transaction.
+                    </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
@@ -377,7 +454,12 @@ export function DonationPage() {
                         id="donor"
                         placeholder="John Smith"
                         value={donationForm.donor}
-                        onChange={(e) => setDonationForm({ ...donationForm, donor: e.target.value })}
+                        onChange={(e) =>
+                          setDonationForm({
+                            ...donationForm,
+                            donor: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                       />
                     </div>
@@ -390,7 +472,12 @@ export function DonationPage() {
                         type="number"
                         placeholder="100.00"
                         value={donationForm.amount}
-                        onChange={(e) => setDonationForm({ ...donationForm, amount: e.target.value })}
+                        onChange={(e) =>
+                          setDonationForm({
+                            ...donationForm,
+                            amount: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                       />
                     </div>
@@ -400,7 +487,9 @@ export function DonationPage() {
                       </Label>
                       <Select
                         value={donationForm.type}
-                        onValueChange={(value) => setDonationForm({ ...donationForm, type: value })}
+                        onValueChange={(value) =>
+                          setDonationForm({ ...donationForm, type: value })
+                        }
                       >
                         <SelectTrigger className="col-span-3">
                           <SelectValue placeholder="Select type" />
@@ -408,8 +497,7 @@ export function DonationPage() {
                         <SelectContent>
                           <SelectItem value="One Time">One Time</SelectItem>
                           <SelectItem value="Monthly">Monthly</SelectItem>
-                          <SelectItem value="Yearly">Yearly</SelectItem>
-                          <SelectItem value="Quarterly">Quarterly</SelectItem>
+                          <SelectItem value="Annually">Annually</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -419,14 +507,20 @@ export function DonationPage() {
                       </Label>
                       <Select
                         value={donationForm.method}
-                        onValueChange={(value) => setDonationForm({ ...donationForm, method: value })}
+                        onValueChange={(value) =>
+                          setDonationForm({ ...donationForm, method: value })
+                        }
                       >
                         <SelectTrigger className="col-span-3">
                           <SelectValue placeholder="Select method" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Credit Card">Credit Card</SelectItem>
-                          <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                          <SelectItem value="Credit Card">
+                            Credit Card
+                          </SelectItem>
+                          <SelectItem value="Bank Transfer">
+                            Bank Transfer
+                          </SelectItem>
                           <SelectItem value="Check">Check</SelectItem>
                           <SelectItem value="Cash">Cash</SelectItem>
                           <SelectItem value="PayPal">PayPal</SelectItem>
@@ -441,13 +535,21 @@ export function DonationPage() {
                         id="notes"
                         placeholder="Additional notes..."
                         value={donationForm.notes}
-                        onChange={(e) => setDonationForm({ ...donationForm, notes: e.target.value })}
+                        onChange={(e) =>
+                          setDonationForm({
+                            ...donationForm,
+                            notes: e.target.value,
+                          })
+                        }
                         className="col-span-3"
                       />
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button variant="outline" onClick={() => setAddDonationDialogOpen(false)}>
+                    <Button
+                      variant="outline"
+                      onClick={() => setAddDonationDialogOpen(false)}
+                    >
                       Cancel
                     </Button>
                     <Button onClick={handleAddDonation}>Add Donation</Button>
@@ -478,15 +580,13 @@ export function DonationPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="One Time">One Time</SelectItem>
-                  <SelectItem value="Monthly">Monthly</SelectItem>
-                  <SelectItem value="Yearly">Yearly</SelectItem>
-                  <SelectItem value="Quarterly">Quarterly</SelectItem>
+                  <SelectItem value="money">Money</SelectItem>
+                  <SelectItem value="material">Material</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
+              {/* <Select value={filterStatus} onValueChange={setFilterStatus}>
                 <SelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Status" />
+                  <SelectValue placeholder="Status" />`
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
@@ -494,7 +594,7 @@ export function DonationPage() {
                   <SelectItem value="Pending">Pending</SelectItem>
                   <SelectItem value="Failed">Failed</SelectItem>
                 </SelectContent>
-              </Select>
+              </Select> */}
             </div>
           </div>
 
@@ -508,21 +608,38 @@ export function DonationPage() {
                   <TableHead>Type</TableHead>
                   <TableHead>Method</TableHead>
                   <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredDonations.map((donation) => (
                   <TableRow key={donation.id}>
-                    <TableCell className="font-medium">{donation.donor}</TableCell>
-                    <TableCell className="font-semibold">${donation.amount.toLocaleString()}</TableCell>
-                    <TableCell>
-                      <Badge className={getTypeBadgeColor(donation.type)}>{donation.type}</Badge>
+                    <TableCell className="font-medium">
+                      {donation.fullName}
                     </TableCell>
-                    <TableCell>{donation.method}</TableCell>
+                    <TableCell className="font-semibold">
+                      {donation.amount
+                        ? `$${String(donation.amount).toLocaleString()}`
+                        : "-"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        className={getTypeBadgeColor(donation.donationType)}
+                      >
+                        {donation.donationType}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{donation.paymentMethod}</TableCell>
                     <TableCell>{donation.date}</TableCell>
                     <TableCell>
-                      <Badge className={getStatusBadgeColor(donation.status)}>{donation.status}</Badge>
+                      {donation.receiptFilename && (
+                        <a
+                          href={`${process.env.NEXT_PUBLIC_APP_URL}/receipt/${donation.receiptFilename}`}
+                          className="p-3 dark:"
+                        >
+                          Download Receipt
+                        </a>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -531,10 +648,12 @@ export function DonationPage() {
           </div>
 
           {filteredDonations.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">No donations found matching your criteria.</div>
+            <div className="text-center py-8 text-muted-foreground">
+              No donations found matching your criteria.
+            </div>
           )}
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

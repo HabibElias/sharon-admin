@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.dev',
+  title: 'Sharon Admin Panel',
+  description: 'Powered by Sabih Software Systems',
+  generator: 'Sabih Software Systems',
 }
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className='font-[poppins]'>{children}</body>
     </html>
   )
 }
