@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   BookOpen,
   DollarSign,
@@ -12,10 +12,21 @@ import {
   Calendar,
   CreditCard,
   Heart,
-} from "lucide-react"
+} from "lucide-react";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import {
   Sidebar,
   SidebarContent,
@@ -30,9 +41,19 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { Badge } from "@/components/ui/badge"
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
+} from "@/components/ui/sidebar";
+import { Badge } from "@/components/ui/badge";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+} from "recharts";
 
 // Sample data
 const memberData = [
@@ -40,14 +61,14 @@ const memberData = [
   { name: "Support", value: 320, fill: "#00C49F" },
   { name: "Prayer", value: 280, fill: "#FFBB28" },
   { name: "Both", value: 150, fill: "#FF8042" },
-]
+];
 
 const donationData = [
   { name: "One Time", value: 1200, fill: "#8884d8" },
   { name: "Monthly", value: 800, fill: "#82ca9d" },
   { name: "Yearly", value: 400, fill: "#ffc658" },
   { name: "Quarterly", value: 300, fill: "#ff7c7c" },
-]
+];
 
 const sidebarItems = [
   {
@@ -60,13 +81,11 @@ const sidebarItems = [
     title: "Membership",
     url: "#",
     icon: Users,
-    badge: "1,200",
   },
   {
     title: "Donation",
     url: "#",
     icon: Gift,
-    badge: "2,700",
   },
   {
     title: "Resource",
@@ -77,9 +96,8 @@ const sidebarItems = [
     title: "Messages",
     url: "#",
     icon: MessageSquare,
-    badge: "12",
   },
-]
+];
 
 const memberChartConfig = {
   professional: {
@@ -98,7 +116,7 @@ const memberChartConfig = {
     label: "Both",
     color: "#FF8042",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 const donationChartConfig = {
   oneTime: {
@@ -117,7 +135,7 @@ const donationChartConfig = {
     label: "Quarterly",
     color: "#ff7c7c",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 function AppSidebar() {
   return (
@@ -129,7 +147,9 @@ function AppSidebar() {
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">Admin Panel</span>
-            <span className="truncate text-xs text-muted-foreground">Church Management</span>
+            <span className="truncate text-xs text-muted-foreground">
+              Church Management
+            </span>
           </div>
         </div>
       </SidebarHeader>
@@ -144,11 +164,6 @@ function AppSidebar() {
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
-                      {item.badge && (
-                        <Badge variant="secondary" className="ml-auto">
-                          {item.badge}
-                        </Badge>
-                      )}
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -158,17 +173,22 @@ function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <div className="p-4 text-center text-xs text-muted-foreground">© 2024 Church Admin System</div>
+        <div className="p-4 text-center text-xs text-muted-foreground">
+          © 2024 Church Admin System
+        </div>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
 
 export function AdminDashboard() {
-  const totalMembers = memberData.reduce((sum, item) => sum + item.value, 0)
-  const totalBooks = 2847
-  const totalDonationPerPerson = 1250
-  const totalDonationMembers = donationData.reduce((sum, item) => sum + item.value, 0)
+  const totalMembers = memberData.reduce((sum, item) => sum + item.value, 0);
+  const totalBooks = 2847;
+  const totalDonationPerPerson = 1250;
+  const totalDonationMembers = donationData.reduce(
+    (sum, item) => sum + item.value,
+    0
+  );
 
   return (
     <SidebarProvider>
@@ -185,11 +205,15 @@ export function AdminDashboard() {
           <div className="grid gap-4 md:grid-cols-3">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Members</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Members
+                </CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{totalMembers.toLocaleString()}</div>
+                <div className="text-2xl font-bold">
+                  {totalMembers.toLocaleString()}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   <span className="text-green-600">+12%</span> from last month
                 </p>
@@ -197,11 +221,15 @@ export function AdminDashboard() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Books</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Books
+                </CardTitle>
                 <BookOpen className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{totalBooks.toLocaleString()}</div>
+                <div className="text-2xl font-bold">
+                  {totalBooks.toLocaleString()}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   <span className="text-green-600">+5%</span> from last month
                 </p>
@@ -209,11 +237,15 @@ export function AdminDashboard() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Avg Donation/Person</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Avg Donation/Person
+                </CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${totalDonationPerPerson.toLocaleString()}</div>
+                <div className="text-2xl font-bold">
+                  ${totalDonationPerPerson.toLocaleString()}
+                </div>
                 <p className="text-xs text-muted-foreground">
                   <span className="text-green-600">+8%</span> from last month
                 </p>
@@ -230,13 +262,27 @@ export function AdminDashboard() {
                   <UserCheck className="h-5 w-5" />
                   Member Categories
                 </CardTitle>
-                <CardDescription>Distribution of members by category</CardDescription>
+                <CardDescription>
+                  Distribution of members by category
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <ChartContainer config={memberChartConfig} className="mx-auto aspect-square max-h-[300px]">
+                <ChartContainer
+                  config={memberChartConfig}
+                  className="mx-auto aspect-square max-h-[300px]"
+                >
                   <PieChart>
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-                    <Pie data={memberData} dataKey="value" nameKey="name" innerRadius={60} strokeWidth={5}>
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel />}
+                    />
+                    <Pie
+                      data={memberData}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={60}
+                      strokeWidth={5}
+                    >
                       {memberData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.fill} />
                       ))}
@@ -246,8 +292,13 @@ export function AdminDashboard() {
                 <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
                   {memberData.map((item) => (
                     <div key={item.name} className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.fill }} />
-                      <span className="text-muted-foreground">{item.name}:</span>
+                      <div
+                        className="h-3 w-3 rounded-full"
+                        style={{ backgroundColor: item.fill }}
+                      />
+                      <span className="text-muted-foreground">
+                        {item.name}:
+                      </span>
                       <span className="font-medium">{item.value}</span>
                     </div>
                   ))}
@@ -256,7 +307,7 @@ export function AdminDashboard() {
             </Card>
 
             {/* Donation Types Chart */}
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Heart className="h-5 w-5" />
@@ -298,33 +349,44 @@ export function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
+               */}
           </div>
-
+          
           {/* Additional Stats */}
           <div className="grid gap-4 md:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Members</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Active Members
+                </CardTitle>
                 <TrendingUp className="h-4 w-4 text-green-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">1,180</div>
-                <p className="text-xs text-muted-foreground">98% of total members</p>
+                <p className="text-xs text-muted-foreground">
+                  98% of total members
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Monthly Donors</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Monthly Donors
+                </CardTitle>
                 <Calendar className="h-4 w-4 text-blue-600" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">800</div>
-                <p className="text-xs text-muted-foreground">Recurring donations</p>
+                <p className="text-xs text-muted-foreground">
+                  Recurring donations
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Revenue
+                </CardTitle>
                 <CreditCard className="h-4 w-4 text-purple-600" />
               </CardHeader>
               <CardContent>
@@ -334,7 +396,9 @@ export function AdminDashboard() {
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">New Messages</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  New Messages
+                </CardTitle>
                 <MessageSquare className="h-4 w-4 text-orange-600" />
               </CardHeader>
               <CardContent>
@@ -346,5 +410,5 @@ export function AdminDashboard() {
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

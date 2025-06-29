@@ -1,6 +1,14 @@
-"use client"
+"use client";
 
-import { BookOpen, Home, MessageSquare, Users, Gift, FileText, Settings } from "lucide-react"
+import {
+  BookOpen,
+  Home,
+  MessageSquare,
+  Users,
+  Gift,
+  FileText,
+  Settings,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -13,13 +21,14 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { Badge } from "@/components/ui/badge"
-import type { PageType } from "@/components/admin-layout"
+} from "@/components/ui/sidebar";
+import { Badge } from "@/components/ui/badge";
+import type { PageType } from "@/components/admin-layout";
+import { useAuth } from "@/components/auth-provider";
 
 interface AppSidebarProps {
-  currentPage: PageType
-  onPageChange: (page: PageType) => void
+  currentPage: PageType;
+  onPageChange: (page: PageType) => void;
 }
 
 const sidebarItems = [
@@ -32,13 +41,11 @@ const sidebarItems = [
     title: "Membership",
     page: "membership" as PageType,
     icon: Users,
-    badge: "1,200",
   },
   {
     title: "Donation",
     page: "donation" as PageType,
     icon: Gift,
-    badge: "2,700",
   },
   {
     title: "Resource",
@@ -49,16 +56,17 @@ const sidebarItems = [
     title: "Messages",
     page: "messages" as PageType,
     icon: MessageSquare,
-    badge: "12",
   },
   {
     title: "Settings",
     page: "settings" as PageType,
     icon: Settings,
   },
-]
+];
 
 export function AppSidebar({ currentPage, onPageChange }: AppSidebarProps) {
+  const { user, signOut } = useAuth();
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -68,7 +76,9 @@ export function AppSidebar({ currentPage, onPageChange }: AppSidebarProps) {
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">Admin Panel</span>
-            <span className="truncate text-xs text-muted-foreground">Church Management</span>
+            <span className="truncate text-xs text-muted-foreground">
+              Church Management
+            </span>
           </div>
         </div>
       </SidebarHeader>
@@ -79,24 +89,34 @@ export function AppSidebar({ currentPage, onPageChange }: AppSidebarProps) {
             <SidebarMenu>
               {sidebarItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton isActive={currentPage === item.page} onClick={() => onPageChange(item.page)}>
+                  <SidebarMenuButton
+                    isActive={currentPage === item.page}
+                    onClick={() => onPageChange(item.page)}
+                  >
                     <item.icon />
                     <span>{item.title}</span>
-                    {item.badge && (
-                      <Badge variant="secondary" className="ml-auto">
-                        {item.badge}
-                      </Badge>
-                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        {user && (
+          <div className="border-t border-muted-foreground p-4">
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-medium">{user.name}</span>
+              <span className="text-xs text-muted-foreground">
+                {user.email}
+              </span>
+            </div>
+          </div>
+        )}
       </SidebarContent>
       <SidebarFooter>
-        <div className="p-4 text-center text-xs text-muted-foreground">© 2024 Church Admin System</div>
+        <div className="p-4 text-center text-xs text-muted-foreground">
+          © 2024 Church Admin System
+        </div>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

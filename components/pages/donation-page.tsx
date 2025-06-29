@@ -66,69 +66,6 @@ import useDonations from "@/hooks/use-donations";
 import Donation from "@/models/Donation";
 
 // Sample donation data
-const donations = [
-  {
-    id: 1,
-    donor: "John Smith",
-    amount: 500,
-    type: "Monthly",
-    method: "Credit Card",
-    date: "2024-01-15",
-    status: "Completed",
-  },
-  {
-    id: 2,
-    donor: "Sarah Johnson",
-    amount: 1200,
-    type: "One Time",
-    method: "Bank Transfer",
-    date: "2024-01-14",
-    status: "Completed",
-  },
-  {
-    id: 3,
-    donor: "Michael Brown",
-    amount: 2500,
-    type: "Yearly",
-    method: "Check",
-    date: "2024-01-13",
-    status: "Pending",
-  },
-  {
-    id: 4,
-    donor: "Emily Davis",
-    amount: 300,
-    type: "Monthly",
-    method: "Credit Card",
-    date: "2024-01-12",
-    status: "Completed",
-  },
-  {
-    id: 5,
-    donor: "David Wilson",
-    amount: 750,
-    type: "Quarterly",
-    method: "PayPal",
-    date: "2024-01-11",
-    status: "Completed",
-  },
-];
-
-const monthlyTrends = [
-  { month: "Jan", amount: 45000 },
-  { month: "Feb", amount: 52000 },
-  { month: "Mar", amount: 48000 },
-  { month: "Apr", amount: 61000 },
-  { month: "May", amount: 55000 },
-  { month: "Jun", amount: 67000 },
-];
-
-const chartConfig = {
-  amount: {
-    label: "Amount",
-    color: "#8884d8",
-  },
-} satisfies ChartConfig;
 
 export function DonationPage() {
   const [searchTerm, setSearchTerm] = useState("");
